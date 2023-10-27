@@ -1,0 +1,14 @@
+[package]
+name = "rustsql"
+version = "0.1.0"
+authors = ["Minling Zhou <minling.zhou@gmail.com>"]
+edition = "2021"
+description = "command-line tool that counts the number of occurrences of each integer in a comma-separated list of integers"
+license = "MIT OR Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rusqlite = "0.23"
+csv = "1.1"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
