@@ -1,11 +1,11 @@
 use std::env;
 use std::error::Error;
-use rustsql::load;
-use rustsql::extract;
-use rustsql::query;
-use rustsql::insert;
-use rustsql::update;
-use rustsql::delete;
+use rustsqlite::load;
+use rustsqlite::extract;
+use rustsqlite::query;
+use rustsqlite::insert;
+use rustsqlite::update;
+use rustsqlite::delete;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();

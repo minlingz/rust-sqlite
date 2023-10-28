@@ -1,5 +1,5 @@
 [package]
-name = "rust-sqlite"
+name = "rustsqlite"
 version = "0.1.0"
 authors = ["Minling Zhou <minling.zhou@gmail.com>"]
 edition = "2021"
