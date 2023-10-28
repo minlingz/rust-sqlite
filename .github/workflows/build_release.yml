@@ -17,7 +17,7 @@ jobs:
         run: cd rust-sqlite && ls -la
 
       - name: Build binary
-        run: cargo build --release
+        run: cd rust-sqlite && cargo build --release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
