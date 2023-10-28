@@ -3,6 +3,9 @@ use std::error::Error;
 use rustsql::load;
 use rustsql::extract;
 use rustsql::query;
+use rustsql::insert;
+use rustsql::update;
+use rustsql::delete;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
@@ -21,6 +24,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     else if phase == "query" {
     let limit = 5;
     query(limit)?;
+    }
+    else if phase == "insert"{
+    insert()?;
+    println!("Data inserted into airbnb.db"); 
+    }
+    else if phase == "update" {
+    update()?;
+    println!("Data updated in airbnb.db");
+    }
+    else if phase == "delete" {
+    delete()?;
+    println!("Data deleted from airbnb.db");
+        
     }
     else {
         println!("Please enter a valid phase: load or extract");
