@@ -1,9 +1,9 @@
 [package]
-name = "rustsql"
+name = "rust-sqlite"
 version = "0.1.0"
 authors = ["Minling Zhou <minling.zhou@gmail.com>"]
 edition = "2021"
-description = "command-line tool that counts the number of occurrences of each integer in a comma-separated list of integers"
+description = "command-line tool that reads a CSV file and imports it into a SQLite database"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
