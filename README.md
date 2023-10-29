@@ -115,12 +115,89 @@ This command will download and install the dependencies for the rustsqlite proje
 
 Once the dependencies are installed, you can use the cargo command-line tool to build and run the rustsqlite project. 
 
+## Use of GitHub Copilot
+The rustsqlite project leverage GitHub Copilot to generate code and documentation for the project. GitHub Copilot is an AI-powered pair programmer that helps you write better code. It learns from your codebase and uses that knowledge to assist you as you write code. Here is an example of how GitHub Copilot helped me debug the error in writing the test case for the project:
+
+![Alt text](pic/copilot.png)
+
+Copilot can also help you write documentation for your project. Here is an example of how Copilot helped me write the documentation for the project and how it took the feedback from me to improve the documentation:
+
+![Alt text](pic/copilot2.png)
+
+## SQLite CRUD operations
+
+### Create
+The rustsqlite project includes a create operation that allows you to create a new listing in the database. The create subcommand takes the following arguments:
+```rust
+pub fn load(dataset: &str) -> Result<(), Box<dyn Error>> {
+    // load dataset into sqlite database
+    ...
+    // drop table if exists
+    ...
+    // create table
+    let create_table = format!("CREATE TABLE airbnb ({})", headers.join(", "));
+    conn.execute::<&[&dyn ToSql]>(&create_table, &[])?;
+    ...
+}
+```
+
+### Read
+The rustsqlite project includes a read operation that allows you to read the data from the database. The read subcommand takes the following arguments:
+```rust
+pub fn query(limit: i64) -> Result<()> {
+    //Read the database and return the average price per night for each neighbourhood
+    let conn = Connection::open("dataset/airbnb.db")?;
+    let count: i64 = conn.query_row("SELECT COUNT(*) FROM airbnb", params![], |row| row.get(0))?;
+    println!("Number of rows in the airbnb table: {}", count);
+    let mut stmt = conn.prepare(
+        "SELECT neighbourhood, AVG(CAST(price AS REAL)) AS avg_price_per_night \
+         FROM airbnb \
+         GROUP BY neighbourhood \
+         ORDER BY avg_price_per_night DESC \
+         LIMIT ?",
+    )?;
+    let rows = stmt.query_map(params![limit], |row| {
+        Ok((row.get::<_, String>(0)?, row.get::<_, f64>(1)?))
+    })?;
+    for row in rows {
+        let (neighbourhood, avg_price_per_night) = row?;
+        println!("{}: ${:.2}/night", neighbourhood, avg_price_per_night);
+    }
+    Ok(())
+}
+```
+
+### Update
+The rustsqlite project includes an update operation that allows you to update the data in the database. The update subcommand takes the following arguments:
+```rust
+pub fn update() -> Result<(), Box<dyn Error>> {
+    // update a record in the database
+    let conn = Connection::open("dataset/airbnb.db")?;
+    conn.execute(
+        "UPDATE airbnb SET price = ?1 WHERE neighbourhood = ?2",
+        params!["20000", "Dummy"],
+    )?;
+    Ok(())
+}
+```
+
+### Delete
+The rustsqlite project includes a delete operation that allows you to delete the data from the database. The delete subcommand takes the following arguments:
+```rust
+pub fn delete() -> Result<(), Box<dyn Error>> {
+    // delete a record from the database
+    let conn = Connection::open("dataset/airbnb.db")?;
+    conn.execute("DELETE FROM airbnb WHERE neighbourhood = ?1", params!["Dummy"])?;
+    Ok(())
+}
+```
+
 ## Github Actions
 
 ### Build and release
-The rustsqlite project includes a GitHub Actions workflow that automatically builds and tests the project whenever a new commit is pushed to the repository. The workflow is defined in the `.github/workflows/build_release.yml` file.
+This project includes a GitHub Actions workflow that automatically builds and tests the project whenever a new commit is pushed to the repository. The workflow is defined in the `.github/workflows/build_release.yml` file.
 
-The workflow is triggered by the push event, which is fired whenever a new commit is pushed to the repository. The workflow runs the following steps:
+The workflow is triggered by the push event, which is fired whenever a new commit is pushed to the repository, it then generates an optimized Rust binary as a GitHub Actions artifact that can be downloaded. The workflow runs the following steps:
 
 ```yml
     steps:
@@ -158,6 +235,39 @@ The rustsqlite project includes a GitHub Actions workflow that automatically tes
       - name: Run clippy
         run: make test
 ```
+It uses built-in Cargo commands to run the tests defined in the `lib.rs`. The tests are defined in the `lib.rs` directory and are run using the `cargo test` command.
+
+```rust
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn test_extract_load() {
+        let url = "https://anlane611.github.io/ids702-fall23/DAA/listings.csv";
+        let file_path = "dataset/listings.csv";
+        let _file_path = extract(url, Some(file_path)).unwrap();
+        assert!(Path::new(file_path).exists());
+        assert!(load("dataset/listings.csv").is_ok());
+    }
+ 
+    #[test]
+    fn test_insert_update_delete() {
+        assert!(insert().is_ok());
+        assert!(update().is_ok());
+        assert!(delete().is_ok());
+    }
+
+    #[test]
+    fn test_query() {
+        assert!(query(5).is_ok());
+    }
+} 
+```
+Example of the test output using Github Actions:
+
+![Alt text](pic/test.png)
+
 ### Lint
 The rustsqlite project includes a GitHub Actions workflow that automatically lint the project whenever a new commit is pushed to the repository. The workflow is defined in the `.github/workflows/lint.yml` file.
 
