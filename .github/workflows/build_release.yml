@@ -18,9 +18,6 @@ jobs:
 
       - name: Build binary
         run: cd rustsqlite && cargo build --release
-      
-      - name: Debug binary file path
-        run: ls -la rustsqlite/target/release/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2

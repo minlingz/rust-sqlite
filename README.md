@@ -1,14 +1,15 @@
-## Rust SQLite ETL
+# Rust SQLite ETL
 
 Rust CLI Binary with SQLite
 
-### Diagram
+## Diagram
 
-![Alt text](706etlrust.png)
+![Alt text](pic/706etlrust.png)
+
 
 (Following content were generated with the help of Github Copilot chat.)
 
-### Description
+## Description
 
 `rustsqlite` is a Rust library for working with SQLite databases. SQLite is a popular embedded database engine that provides a lightweight and efficient way to store and retrieve data.
 
@@ -31,7 +32,16 @@ The project is organized into several modules, including:
 * `lib.rs` - The main module that defines the load and query functions for loading data into the database and querying the database, respectively.
 * `main.rs` - The main main entry point for the command-line tool. It uses the clap crate to parse command-line arguments and dispatches to the appropriate function based on the subcommand.
 
-### How to use the rustsqlite project
+    The `main.rs` file defines several functions for working with the Airbnb listings data, including:
+
+    * `extract`: A function that extracts the dataset from internet and save it as a CSV file.
+    * `load`: A function that loads the data from a CSV file into an SQLite database.
+    * `query`: A function that runs SQL queries on the database to retrieve information about the listings.
+    * `insert`: A function that inserts a new record into the database.
+    * `update`: A function that updates an existing record in the database.
+    * `delete`: A function that deletes a record from the database.
+
+## How to use the rustsqlite project
 
 Here's an example of how to extract the dataset from internet and save it as a CSV file:
 
@@ -75,7 +85,7 @@ $ cargo run delete
 
 In this example, we're using the delete subcommand to run a SQL query on the airbnb.db database. The query deletes the listing from the database.
 
-### Dependencies and how to install them
+## Dependencies and how to install them
 
 The rustsqlite project depends on several Rust crates, which are listed in the `Cargo.toml` file. To install these dependencies, you can use the cargo command-line tool, which is included with Rust.
 
@@ -104,3 +114,62 @@ cargo build
 This command will download and install the dependencies for the rustsqlite project. It may take a few minutes to complete, depending on your internet connection and the speed of your computer.
 
 Once the dependencies are installed, you can use the cargo command-line tool to build and run the rustsqlite project. 
+
+## Github Actions
+
+### Build and release
+The rustsqlite project includes a GitHub Actions workflow that automatically builds and tests the project whenever a new commit is pushed to the repository. The workflow is defined in the `.github/workflows/build_release.yml` file.
+
+The workflow is triggered by the push event, which is fired whenever a new commit is pushed to the repository. The workflow runs the following steps:
+
+```yml
+    steps:
+        - name: Checkout code
+            uses: actions/checkout@v2
+        
+        - name: Change directory
+            run: cd rustsqlite && ls -la
+
+        - name: Build binary
+            run: cd rustsqlite && cargo build --release
+
+        - name: Upload artifact
+            uses: actions/upload-artifact@v2
+            with:
+            name: rustsqlite
+            path: rustsqlite/target/release/rustsqlite
+```
+Example of the output:
+
+![Alt text](pic/artifacts.png)
+
+### Tests
+The rustsqlite project includes a GitHub Actions workflow that automatically tests the project whenever a new commit is pushed to the repository. The workflow is defined in the `.github/workflows/tests.yml` file.
+
+```yml
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: clippy, rustfmt
+          override: true
+      - name: Run clippy
+        run: make test
+```
+### Lint
+The rustsqlite project includes a GitHub Actions workflow that automatically lint the project whenever a new commit is pushed to the repository. The workflow is defined in the `.github/workflows/lint.yml` file.
+
+```yml
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: clippy, rustfmt
+          override: true
+      - name: Run clippy
+        run: make lint
+```
