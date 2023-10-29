@@ -7,4 +7,4 @@ for DIR in */; do
     (cd $DIR && cargo test)
 done
 
-echo "Format complete."
+echo "Test complete."

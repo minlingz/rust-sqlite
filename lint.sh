@@ -7,4 +7,4 @@ for DIR in */; do
     (cd $DIR && cargo clippy --all-targets --all-features -- -D warnings)
 done
 
-echo "Format complete."
+echo "Lint complete."

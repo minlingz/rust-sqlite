@@ -6,7 +6,7 @@ use std::fs::File;
 use rusqlite::Connection;
 use csv::ReaderBuilder;
 use rusqlite::ToSql;
-use reqwest;
+//use reqwest;
 use rusqlite::{params, Result};
 
 
@@ -98,3 +98,29 @@ pub fn query(limit: i64) -> Result<()> {
     Ok(())
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn test_extract_load() {
+        let url = "https://anlane611.github.io/ids702-fall23/DAA/listings.csv";
+        let file_path = "dataset/listings.csv";
+        let _file_path = extract(url, Some(file_path)).unwrap();
+        assert!(Path::new(file_path).exists());
+        assert!(load("dataset/listings.csv").is_ok());
+    }
+ 
+    #[test]
+    fn test_insert_update_delete() {
+        assert!(insert().is_ok());
+        assert!(update().is_ok());
+        assert!(delete().is_ok());
+    }
+
+    #[test]
+    fn test_query() {
+        assert!(query(5).is_ok());
+    }
+} 
