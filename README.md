@@ -1,132 +1,106 @@
-## SQLite Lab
+## Rust SQLite ETL
 
-Python Script interacting with SQL Database
+Rust CLI Binary with SQLite
 
 ### Diagram
 
-![Alt text](706etl.png)
+![Alt text](706etlrust.png)
 
-### Files
+(Following content were generated with the help of Github Copilot chat.)
 
-* `mylib/extract.py` -- [E] Extract a dataset from a URL of file in CSV format as dataset.
-* `mylib/transform_load.py` 
-    -- [T] Transform the data by cleaning, filtering, enriching, etc to get it ready for analysis.
-    -- [L] Load the transformed data into a SQLite database table using Python's sqlite3 module.
-* `mylib/query.py` -- [Q] Write and execute SQL queries on the SQLite database to analyze and retrieve insights from the data.
-* `main.py` -- [E] [T] [L] [Q] Run the ETL process end-to-end using fire to parse command-line arguments.
-* `dataset/listings.csv` -- The dataset used in this lab. It contains information about Airbnb listings.
-* `airbnb.db` -- The SQLite database created by the ETL process.
+### Description
 
-### Main.py
+`rustsqlite` is a Rust library for working with SQLite databases. SQLite is a popular embedded database engine that provides a lightweight and efficient way to store and retrieve data.
 
-Using the fire module to parse command-line arguments, the main.py script runs the ETL process end-to-end. It extracts the dataset from a CSV file, transforms it by cleaning and filtering the data, loads it into a SQLite database, and runs queries on the database to analyze and retrieve insights from the data.
+The rust-sqlite library provides a high-level API for working with SQLite databases in Rust. It allows you to create, read, update, and delete data in an SQLite database using Rust code.
 
-```python
-"""
-ETL-Query script
-"""
-import fire
-from mylib.extract import extract
-from mylib.transform_load import load
-from mylib.query import query
+The library provides a number of useful features, including:
 
-class QueryCLI:
-    def extract(self):
-        """Extract data from source"""
-        extract()
+* A simple and intuitive API for working with SQLite databases
+* Support for transactions and prepared statements
+* Support for custom functions and aggregates
+* Support for user-defined types and collations
 
-    def transform_load(self):
-        """Transform and load data into target"""
-        load()
+A flexible and extensible architecture that allows you to customize the behavior of the library
+The rust-sqlite library is widely used in the Rust community and is considered to be one of the best SQLite libraries available for Rust.
 
-    def query(self, limit=5):
-        """Query the target database for the top N rows"""
-        query(limit)
-...
+The rustsqlite project that you provided is an example project that demonstrates how to use the rust-sqlite library to build a simple command-line tool for working with Airbnb listings data. The project includes code for loading data from a CSV file into an SQLite database, and for querying the database to retrieve information about the listings.
+
+The project is organized into several modules, including:
+
+* `lib.rs` - The main module that defines the load and query functions for loading data into the database and querying the database, respectively.
+* `main.rs` - The main main entry point for the command-line tool. It uses the clap crate to parse command-line arguments and dispatches to the appropriate function based on the subcommand.
+
+### How to use the rustsqlite project
+
+Here's an example of how to extract the dataset from internet and save it as a CSV file:
+
+```bash
+$ cargo run extract
 ```
 
-### Extract.py
+You can use the rustsqlite command-line tool to load the Airbnb listings data into an SQLite database:
 
-The extract.py script extracts the dataset from a CSV file and returns the dataset file path.
-
-```python
-"""
-Extract a dataset from a URL like Kaggle or data.gov. JSON or CSV formats 
-
-"""
-...
-def extract(
-    url="https://anlane611.github.io/ids702-fall23/DAA/listings.csv",
-    file_path="dataset/listings.csv",
-):
-    """ "Extract a url to a file path"""
-    with requests.get(url) as r:
-        with open(file_path, "wb") as f:
-            f.write(r.content)
-    return file_path
-...
+```bash
+$ cargo run load
 ```
 
-### Transform_load.py
+In this example, we're using the cargo run command to run the rustsqlite command-line tool with the load subcommand. The load subcommand loads the Airbnb listings data from the listings.csv file into an SQLite database named airbnb.db.
 
-The transform_load.py script transforms the data by cleaning and filtering it, e.g. removing '$' from price column,  then loads it into a SQLite database table using Python's sqlite3 module.
+Once the data is loaded into the database, we can use the query subcommand to run SQL queries on the database to retrieve information about the listings. For example:
 
-```python
-...
-def load(dataset="dataset/listings.csv"):
-    """Transforms and Loads data into the local SQLite3 database"""
-
-    with open(dataset, newline="") as csvfile:
-        reader = csv.reader(csvfile)
-        columns = next(reader)
-
-    with sqlite3.connect("airbnb.db") as conn:
-        conn.execute("DROP TABLE IF EXISTS airbnb")
-
-        # generate CREATE TABLE statement dynamically
-        create_table = f"CREATE TABLE airbnb ({', '.join(columns)})"
-        conn.execute(create_table)
-
-        # insert data into table
-        with open(dataset, newline="") as csvfile:
-            reader = csv.reader(csvfile)
-            next(reader)  # skip header row
-            for row in reader:
-                # remove $ from price column
-                row[40] = row[40].replace("$", "")
-                placeholders = ",".join(["?"] * len(row))
-                insert_stmt = f"INSERT INTO airbnb VALUES ({placeholders})"
-                conn.execute(insert_stmt, row)
-
-    return "airbnb.db"
-...
+```bash
+$ cargo run query
 ```
 
-### Query.py
-The query.py script writes and executes SQL queries on the SQLite database to analyze and retrieve insights from the data.
+In this example, we're using the query subcommand to run a SQL query on the airbnb.db database. The query Read the database and return the average price per night for each neighbourhood.
 
-```python
-...
-def query(limit=5):
-    """Query the database for the top N rows of the airbnb table"""
-    conn = sqlite3.connect("airbnb.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        f"SELECT price, bedrooms, room_type, bathrooms_text FROM airbnb LIMIT {limit}"
-    )
-    rows = cursor.fetchall()
-    print(f"Top {limit} rows of the airbnb table:")
-    column_names = [description[0] for description in cursor.description]
-    output = [column_names] + [[row[i] for i in range(len(row))] for row in rows]
-    pprint(output)
-    conn.close()
-    return "Success"
-...
+You can also use the rustsqlite command-line tool to run CRUD SQL queries on the database. For example:
+
+```bash
+$ cargo run insert
 ```
 
-### Results
+In this example, we're using the insert subcommand to run a SQL query on the airbnb.db database. The query inserts a new listing into the database.
 
-By running `python main.py query --limit 10`, it will return the top 10 rows of the airbnb table.
+```bash
+$ cargo run update
+```
 
-![Alt text](success.png)
+In this example, we're using the update subcommand to run a SQL query on the airbnb.db database. The query updates the price of the inserted in the database to $2000 per night.
+    
+```bash
+$ cargo run delete
+```
 
+In this example, we're using the delete subcommand to run a SQL query on the airbnb.db database. The query deletes the listing from the database.
+
+### Dependencies and how to install them
+
+The rustsqlite project depends on several Rust crates, which are listed in the `Cargo.toml` file. To install these dependencies, you can use the cargo command-line tool, which is included with Rust.
+
+Here are the steps to install the dependencies for the rustsqlite project:
+
+1. Install Rust: If you haven't already installed Rust, you can download and install it from the official Rust website: https://www.rust-lang.org/tools/install
+
+2. Clone the rustsqlite repository: You can clone the rustsqlite repository from GitHub using the following command:
+    
+```bash
+git clone https://github.com/minlingz/rust-sqlite
+```
+
+3. Change to the rustsqlite directory: Use the following command to change to the rustsqlite directory:
+
+```bash
+cd rustsqlite
+```
+
+4. Install the dependencies: Use the following command to install the dependencies listed in the Cargo.toml file:
+
+```bash
+cargo build
+```
+
+This command will download and install the dependencies for the rustsqlite project. It may take a few minutes to complete, depending on your internet connection and the speed of your computer.
+
+Once the dependencies are installed, you can use the cargo command-line tool to build and run the rustsqlite project. 
