@@ -283,3 +283,6 @@ The rustsqlite project includes a GitHub Actions workflow that automatically lin
       - name: Run clippy
         run: make lint
 ```
+
+## Youtube demo
+Youtube demo can be found https://youtu.be/5fUqRmFkOe8 
